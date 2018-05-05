@@ -11,10 +11,11 @@ class MicroCommunity:
         self.article_url = 'http://www.yiban.cn/forum/article/listAjax'
         self.post = dict(channel_id=55461, group_id=0, my=0, need_notice=0, orderby='updateTime', page=1, puid=5189448,
                          Sections_id=-1, size=200)
-        self.del_content = ['Channel_id', 'User_id', 'isNotice', 'isLocked', 'isWeb', 'replyTime', 'updateTime',
-                            'status', 'UserGroup_id', 'oldArtId', 'oldAreaId', 'content', 'files_count',
+        self.del_content = ['Channel_id', 'User_id', 'isNotice', 'isWeb', 'replyTime', 'updateTime',
+                             'UserGroup_id', 'oldArtId', 'oldAreaId', 'content', 'files_count',
                             'Sections_name', 'aid', 'images', 'editPermission', 'delPermission', 'sections_title'
-                            ]
+                            ]#, 'isLocked''status',
+        self.c_name = ['新韵能源','魅力材料','明德机电','菁华土木','尚学电信','慎微软件','风华能动','炫彩生命','精进理学','计通新闻','计通学院','青春法学','励志外院','韶华经管','至美设计','多彩石化','石小易']
         self.num = 1
         self.file = 'MicroCommunity'
         self.item = tuple(self.delete(self.content()[0]))
@@ -44,7 +45,7 @@ class MicroCommunity:
         state = 1
         while state:
             for line in self.content():
-                # print(line['createTime'])
+                print(line['createTime'])
                 # print(line)
                 if line['updateTime'][:3] == time+'-':
                     # \or line_content['createTime'][5:7] == time:
@@ -64,6 +65,30 @@ class MicroCommunity:
         json.dump(content, file, indent=4)
         file.close()
 
+    # 标题关键词计数
+    def count(self, table='table0',keyw='红柳易讯',mouth='04'):
+        db = sqlite3.connect(self.file + '.db')
+        c = db.cursor()
+        content = c.execute(f'SELECT * FROM {table}')
+        dict = {}
+        k=0
+        for line in content:
+            if line[1].find(keyw)!=-1:
+                if line[4][:2] == mouth:
+                    if line[7]=='1':
+                        dict.setdefault(keyw, 0)#字典初始化
+                        dict[keyw] += 1
+                    else:
+                        k=k+1
+                        print(k,end='\t')
+                        print(line[4]+' '+line[1]+' http//www.yiban.cn'+line[10])
+                        
+                    # print(line[7],end='')
+        db.commit()
+        db.close()
+        return dict
+
+    # 排行
     def top(self, key, num, table='table0'):
         data = []
         db = sqlite3.connect(self.file + '.db')
@@ -81,9 +106,9 @@ class MicroCommunity:
                     data[number-1], data[number] = data[number], data[number-1]
         self.json_save(data, file_name=row)
         for show in data:
-            print(show)
+            # print(show)
             # print(show.values())
-            # print(show['title']+'\t'+show['createTime']+'\t'+show['clicks']+'\t'+show['url'])
+            print(show['title']+'$'+show['createTime']+'$'+show['clicks']+'$'+show['url'])
         db.commit()
         db.close()
 
@@ -94,8 +119,8 @@ class MicroCommunity:
         content = c.execute(f'SELECT * FROM {table}')
         dict = {}
         for line in content:
-            dict.setdefault(line[7], 0)
-            dict[line[7]] += 1
+            dict.setdefault(line[8], 0)
+            dict[line[8]] += 1
         list = sorted(dict.items(), key=lambda x: x[1], reverse=True)
         k = 0
         for item in list:
@@ -107,7 +132,7 @@ class MicroCommunity:
         db.close()
 
     # 点击排行
-    def top_clicks(self, num=5): self.top(4, num)
+    def top_clicks(self, num=5): self.top(5, num)
 
     def top_average_clicks(self, table='table0'):
         # 从数据库获取数据
@@ -117,10 +142,10 @@ class MicroCommunity:
         dict = {}
         clicks={}
         for line in content:
-            dict.setdefault(line[7], 0)
-            dict[line[7]] += 1
-            clicks.setdefault(line[7], 0)
-            clicks[line[7]] += int(line[4])
+            dict.setdefault(line[8], 0)
+            dict[line[8]] += 1
+            clicks.setdefault(line[8], 0)
+            clicks[line[8]] += int(line[5])
         for item in dict:
             dict[item] = clicks[item]/dict[item]
         list = sorted(dict.items(), key=lambda x: x[1], reverse=True)
@@ -134,10 +159,22 @@ class MicroCommunity:
         db.close()
 
     # 回复排行
-    def top_reply_count(self, num=5): self.top(2, num)
+    def top_reply_count(self, num=5): self.top(3, num)
 
     # 点赞排行榜
-    def top_up_count(self, num=5): self.top(5, num)
+    def top_up_count(self, num=5): self.top(6, num)
+
+    def c_count(self,mouth0='04'):
+        c_dict={}
+        k=0
+        for line in self.c_name:
+            item=self.count(keyw=line, mouth=mouth0)
+            c_dict[line]=item[line]
+        for c_line in c_dict.keys():
+            k=k+1
+            print(k,end='\t')
+            print(c_line,end='\t')
+            print(c_dict[c_line])
 
     # def xlsx(self, content):
     #     content_book = Workbook()
@@ -158,9 +195,10 @@ def show():
 
 if __name__ == '__main__':
     lut = MicroCommunity()
-    # lut.save()
-
+    # lut.save('03')
     # lut.top_clicks(100)
+    # print(lut.count(keyw='石小易'))
+    lut.c_count()
     # lut.top_reply_count()
     # lut.top_up_count()
     # lut.top_name()
