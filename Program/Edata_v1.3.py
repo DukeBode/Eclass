@@ -15,6 +15,7 @@ class MicroCommunity:
                              'UserGroup_id', 'oldArtId', 'oldAreaId', 'content', 'files_count',
                             'Sections_name', 'aid', 'images', 'editPermission', 'delPermission', 'sections_title'
                             ]#, 'isLocked''status',
+        # 
         self.c_name = ['新韵能源','魅力材料','明德机电','菁华土木','尚学电信','慎微软件','风华能动','炫彩生命','精进理学','计通新闻','计通学院','青春法学','励志外院','韶华经管','至美设计','多彩石化','石小易']
         self.num = 1
         self.file = 'MicroCommunity'
@@ -78,11 +79,11 @@ class MicroCommunity:
                     if line[7]=='1':
                         dict.setdefault(keyw, 0)#字典初始化
                         dict[keyw] += 1
+                        # print(line)
                     else:
                         k=k+1
                         print(k,end='\t')
                         print(line[4]+' '+line[1]+' http//www.yiban.cn'+line[10])
-                        
                     # print(line[7],end='')
         db.commit()
         db.close()
@@ -99,16 +100,15 @@ class MicroCommunity:
             number = len(data)
             if number > num:
                 data = data[:num]
+            # print(line)
             data.append(dict(zip(self.item, line)))
             while number > 1:
                 number -= 1
                 if int(data[number-1][row]) < int(data[number][row]):
                     data[number-1], data[number] = data[number], data[number-1]
-        self.json_save(data, file_name=row)
+        # self.json_save(data, file_name=row)
         for show in data:
-            # print(show)
-            # print(show.values())
-            print(show['title']+'$'+show['createTime']+'$'+show['clicks']+'$'+show['url'])
+            print(show['title']+'$'+show['createTime']+'$'+list(show.values())[key]+'$'+show['url'])
         db.commit()
         db.close()
 
@@ -119,8 +119,8 @@ class MicroCommunity:
         content = c.execute(f'SELECT * FROM {table}')
         dict = {}
         for line in content:
-            dict.setdefault(line[8], 0)
-            dict[line[8]] += 1
+            dict.setdefault(line[9], 0)
+            dict[line[9]] += 1
         list = sorted(dict.items(), key=lambda x: x[1], reverse=True)
         k = 0
         for item in list:
@@ -142,10 +142,10 @@ class MicroCommunity:
         dict = {}
         clicks={}
         for line in content:
-            dict.setdefault(line[8], 0)
-            dict[line[8]] += 1
-            clicks.setdefault(line[8], 0)
-            clicks[line[8]] += int(line[5])
+            dict.setdefault(line[9], 0)
+            dict[line[9]] += 1
+            clicks.setdefault(line[9], 0)
+            clicks[line[9]] += int(line[5])
         for item in dict:
             dict[item] = clicks[item]/dict[item]
         list = sorted(dict.items(), key=lambda x: x[1], reverse=True)
@@ -195,11 +195,19 @@ def show():
 
 if __name__ == '__main__':
     lut = MicroCommunity()
-    # lut.save('03')
+    # 月份减一，只首次运行
+    # lut.save('05')
+    # 点击量排行
     # lut.top_clicks(100)
-    # print(lut.count(keyw='石小易'))
-    lut.c_count()
-    # lut.top_reply_count()
-    # lut.top_up_count()
-    # lut.top_name()
+    # 本月，关键词数量统计
+    # print(lut.count(keyw='魅力材料',mouth='05'))
+    # 院发帖统计
+    # lut.c_count(mouth0='06')
+    # 回复
+    # lut.top_reply_count(num=100)
+    # 点赞
+    # lut.top_up_count(num=100)
+    # 个人发帖量排行
+    lut.top_name()
+    # 个人帖均浏览量
     # lut.top_average_clicks()
