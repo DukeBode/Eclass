@@ -8,7 +8,7 @@ import sqlite3
 
 class MicroCommunity:
     def __init__(self):
-        self.article_url = 'http://www.yiban.cn/forum/article/listAjax'
+        self.article_url = 'https://www.yiban.cn/forum/article/listAjax'
         self.post = dict(channel_id=55461, group_id=0, my=0, need_notice=0, orderby='updateTime', page=1, puid=5189448,
                          Sections_id=-1, size=200)
         self.del_content = ['Channel_id', 'User_id', 'isNotice', 'isWeb', 'replyTime', 'updateTime',
@@ -196,9 +196,9 @@ def show():
 if __name__ == '__main__':
     lut = MicroCommunity()
     # 月份减一，只首次运行
-    # lut.save('05')
+    # lut.save('06')
     # 点击量排行
-    # lut.top_clicks(100)
+    lut.top_clicks(100)
     # 本月，关键词数量统计
     # print(lut.count(keyw='魅力材料',mouth='05'))
     # 院发帖统计
@@ -208,6 +208,6 @@ if __name__ == '__main__':
     # 点赞
     # lut.top_up_count(num=100)
     # 个人发帖量排行
-    lut.top_name()
+    # lut.top_name()
     # 个人帖均浏览量
     # lut.top_average_clicks()
