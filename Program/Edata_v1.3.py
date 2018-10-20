@@ -196,9 +196,9 @@ def show():
 if __name__ == '__main__':
     lut = MicroCommunity()
     # 月份减一，只首次运行
-    # lut.save('06')
+    # lut.save('08')
     # 点击量排行
-    lut.top_clicks(100)
+    # lut.top_clicks(100)
     # 本月，关键词数量统计
     # print(lut.count(keyw='魅力材料',mouth='05'))
     # 院发帖统计
@@ -210,4 +210,4 @@ if __name__ == '__main__':
     # 个人发帖量排行
     # lut.top_name()
     # 个人帖均浏览量
-    # lut.top_average_clicks()
+    lut.top_average_clicks()
